@@ -1,88 +1,73 @@
-import React, { Component } from 'react'
-import Newsitem from './Newsitem'
-import imgError from './imgError.png'
+import React, { useState, useEffect } from 'react'
+import InfiniteScroll from 'react-infinite-scroll-component'
+import Newsitem from "./Newsitem";
+import imgError from "./imgError.png";
+import Spinner from "./Spinner";
 
-export default class News extends Component {
-
-   constructor(){
-       super();
-       this.state = {
-        articles: [],
-        loading: false,
-        page: 1,
-        country: 'us',
-        
-       };
-       
-       
-       
-    };
-
-       async componentDidMount(){
-        const url = `https://newsapi.org/v2/top-headlines?country=${this.state.country}&apiKey=201d817950df4a249160a2187ab8d113&page=${this.state.page}`;
-        let data = await fetch(url);
-        let parsedData = await data.json();
-        this.setState({articles: parsedData.articles});
-        //fetch will not work on mobile devices as the api does not support fetching from host other than 
-        // localhost
-        // this will show up as undefined in other devices
-        
-    }
+export default function News() {
     
-   
-    
-  render() {
-    
-    let handlePrev = ()=>{
-        if (this.state.page >= 1) this.setState({
-            page: this.state.page -1
-        })
-    }
-    let handleNext = ()=>{
-        this.setState({
-            page: (this.state.page + 1)
-        })
-    }
-    return (
+        const apiKey = 'b87c7a1b9fc44569859cb77b6f6fd969';
+        const [articles, setArticles] = useState([]);
         
-
-        <div>
-            <div className="d-inline-flex my-5 mx-3 bg-dark">
-
-                <div className='row' >
-                <h2 className='d-flex justify-content-center mt-5 mb-2'>Top News Headlines</h2>
-                    {this.state.articles.map((element) => {
-                       //console.log(typeof element)
-                        return <div className='col-md-4' key={element.url} >
-                            <Newsitem title={element.title ===null?'Not available':element.title} 
-                            description={element.description ===null? 'Not available!':element.description} imgUrl={element.urlToImage===null? imgError:element.urlToImage}
-                                url={element.url} readMore={element.url}>
-
-                            </Newsitem>
-                        </div>
-                        
-                }
-                    ) 
-                
-                }
-
-                    
-                </div>
-            </div>
-            <div className='container d-flex justify-content-between'>
-
-                    <button type="button" className="btn btn-primary btn-lg" onClick={handlePrev} >&larr; Prev</button>
-                    <button type="button" className="btn btn-primary btn-lg" onClick={handleNext}>Next &rarr;</button>
-
-            </div>
+        const [page, setPage] = useState(1);
+        const [country, setCountry] = useState('in');
+        const [totalResults, setTotalResults] = useState(0);
+      
+        const fetchArticles = async () => {
             
-        </div>
+            const url = `https://newsapi.org/v2/top-headlines?country=${country}&apiKey=${apiKey}&page=${page}&pageSize=10`;
+            let data = await fetch(url);
+            let parsedData = await data.json();
+            setArticles(parsedData.articles);
+            setTotalResults(parsedData.totalResults);
+          };
+        useEffect(() => {
+          
+      
+          fetchArticles();
+        }, []);
 
-
-
-        
+        const pagingSet = () => { setPage(page+1)}
+      
+        const fetchMoreData = async () => {
+          pagingSet();
+          const url = `https://newsapi.org/v2/top-headlines?country=${country}&apiKey=${apiKey}&page=${page+1}&pageSize=10`;
+          let data = await fetch(url);
+          let parsedData = await data.json();
+          setArticles(articles.concat(parsedData.articles));
+        };
+    
+      
+        return (
+          <div>
+            <h2 className="d-flex justify-content-center mt-5 mb-2">Top News Headlines</h2>
+      
+            <InfiniteScroll
+              dataLength={articles.length}
+              next={fetchMoreData}
+              hasMore={articles.length !== totalResults}
+              loader={<Spinner />}
+            >
+              <div className="d-flex my-5 mx-3 bg-dark">
+                <div className="row">
+                  {articles.map((element) => (
+                    <div className="col-md-4" key={element.url}>
+                      <Newsitem
+                        title={element.title === null ? 'Not available' : element.title}
+                        description={element.description === null ? 'Not available!' : element.description}
+                        imgUrl={element.urlToImage === null ? imgError : element.urlToImage}
+                        url={element.url}
+                        readMore={element.url}
+                      />
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </InfiniteScroll>
+          </div>
+        );
+      };
+      
+     
       
 
-    )
-  }
-}
