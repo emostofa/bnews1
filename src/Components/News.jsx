@@ -10,7 +10,7 @@ export default function News() {
         const [articles, setArticles] = useState([]);
         
         const [page, setPage] = useState(1);
-        const [country, setCountry] = useState('in');
+        const [country, setCountry] = useState('us');
         const [totalResults, setTotalResults] = useState(0);
       
         const fetchArticles = async () => {
@@ -20,6 +20,7 @@ export default function News() {
             let parsedData = await data.json();
             setArticles(parsedData.articles);
             setTotalResults(parsedData.totalResults);
+            console.log(articles);
           };
         useEffect(() => {
           
@@ -27,20 +28,21 @@ export default function News() {
           fetchArticles();
         }, []);
 
-        const pagingSet = () => { setPage(page+1)}
+        
       
         const fetchMoreData = async () => {
-          pagingSet();
+          setPage(page+1);
           const url = `https://newsapi.org/v2/top-headlines?country=${country}&apiKey=${apiKey}&page=${page+1}&pageSize=10`;
           let data = await fetch(url);
           let parsedData = await data.json();
           setArticles(articles.concat(parsedData.articles));
+          
         };
     
       
         return (
           <div>
-            <h2 className="d-flex justify-content-center mt-5 mb-2">Top News Headlines</h2>
+            <h2 className="d-flex justify-content-center" style={{marginTop: '100px'}}>{`Top ${country === 'in' ? 'Indian': country.toUpperCase()} Headlines`}</h2>
       
             <InfiniteScroll
               dataLength={articles.length}
@@ -48,7 +50,7 @@ export default function News() {
               hasMore={articles.length !== totalResults}
               loader={<Spinner />}
             >
-              <div className="d-flex my-5 mx-3 bg-dark">
+              <div className="d-flex my-3 mx-3 bg-dark">
                 <div className="row">
                   {articles.map((element) => (
                     <div className="col-md-4" key={element.url}>
