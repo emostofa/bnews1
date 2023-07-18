@@ -7,7 +7,7 @@ import logo3 from "./logo3.png"
 export default class Navbar extends Component {
   render() {
     return (
-        <nav className="navbar navbar-expand-lg bg-body-tertiary bg-dark " data-bs-theme='dark'>
+        <nav className="navbar navbar-expand-lg bg-body-tertiary bg-dark sticky-top" data-bs-theme='dark'>
             <a class="navbar-brand" href="/">
             <img src={logo3} alt="Logo" width="140" height='50' class="d-inline-block align-text-top"/>
             1
