@@ -8,7 +8,7 @@ const news = [{"source":{"id":"cnn","name":"CNN"},"author":"Josh Pennington, Ale
 
 export default function News() {
     
-        // const apiKey = 'b87c7a1b9fc44569859cb77b6f6fd969';
+        const apiKey = 'b87c7a1b9fc44569859cb77b6f6fd969';
         const [articles, setArticles] = useState(news);
         
         const [page, setPage] = useState(1);
@@ -37,7 +37,7 @@ export default function News() {
           const url = `https://newsapi.org/v2/top-headlines?country=${country}&apiKey=${apiKey}&page=${page+1}&pageSize=10`;
           let data = await fetch(url);
           let parsedData = await data.json();
-          setArticles(articles.concat(parsedData.articles));
+          setArticles(articles.concat(parsedData.articles??news));
           
         };
     
